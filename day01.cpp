@@ -17,10 +17,10 @@ int main()
 	int part2 = 0;
 	while (getline(myfile, line)) { 
 		if ((line[0] == 'R') ^ (current >= 0)) {current=(current + (2*(current < 0)-1)*100)%100;}
-		int clicks = current + (2 * (line[0] == 'R') - 1) * stoi(line.substr(1)) ;
-		current = clicks %100 ;
-		part1 += (current == 0);
-		part2 += abs(clicks / 100);
+		current += stoi(line.substr(1)) ;
+		part2 += abs(current / 100);
+		current = current%100 ;
+		part1 += (current = 0);
 	}
 
 	cout << part1 << endl;
