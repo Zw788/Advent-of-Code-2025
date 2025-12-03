@@ -16,24 +16,20 @@ long long repeat(const int& x, const int& n) {
 	return stoll(res);
 }
 
-set<long long> errcheck(const string& l, const vector<int>& v, string f ) {
-	if (l.length() < 2) { return {}; }
+set<long long> errcheck(const string& l, const vector<int>& v, string f) {
+	if (l.length() < 2 || l.length() != f.length() ) { return {}; }
 
 	set<long long> res = {};
-	long long lnum = stoll(l);
-	long long fnum = stoll(f);
-
 	for (auto n : v) {
 		int i = stoi(l.substr(0, n));
-		int r = repeat(i, l.length() / n);
+		long long r = repeat(i, l.length() / n);
 
-		while (repeated <= lnum && repeated >= fnum) {
-			res.insert(repeated);
+		do {
+			if (r <= stoll(l) && r >= stoll(f)) {res.insert(r);}
 			--i;
 			r = repeat(i, l.length() / n);
-		}
+		} while (r >= stoll(f));
 	}
-
 	return res;
 }
 
@@ -44,7 +40,7 @@ int main()
 	ifstream myfile;
 	myfile.open("../aoc2025/inputs/aoc2025_input.txt");
 
-	vector<vector<int>> factors = { {1},{1},{2},{1},{2,3},{1},{4},{3},{2,5},{1},{4,6},{1} };
+	vector<vector<int>> factors = { {},{1},{1},{2},{1},{2,3},{1},{4},{3},{2,5},{1},{4,6},{1} };
 	string first;
 	string last;
 	bool _ = 1;
@@ -57,37 +53,34 @@ int main()
 		if (ch == ',') {
 			//cout << "First: " << first << " Last: " << last << endl;
 			for (int d = last.length(); d >= first.length(); --d) {
-				string l = (d == last.length())? last : to_string(int(pow(10,d)-1)) ;
-				string f = (first.length() == d ) ? first : to_string(int(pow(10, d-1)));
-
-				if (d % 2 == 0) { 
-					auto s = errcheck(l, { d / 2 }, f); 
-					part1.insert(s.begin(), s.end()); 
+				string l = (d == last.length()) ? last : to_string(int(pow(10, d) - 1));
+				string f = (first.length() == d) ? first : to_string(int(pow(10, d - 1)));
+				if (d % 2 == 0) {
+					auto s = errcheck(l, { d / 2 }, f);
+					part1.insert(s.begin(), s.end());
 				}
-
-				auto s = errcheck(l, factors[l.length() - 2], f);
+				auto s = errcheck(l, factors[l.length() - 1], f);
 				part2.insert(s.begin(), s.end());
 			}
 			first = "";
 			last = "";
 			_ = 1;
 		}
-		else if (ch == '-') {_ = 0;	}
-		else if (_) {first +=ch;}
-		else {last +=ch;}
+		else if (ch == '-') { _ = 0; }
+		else if (_) { first += ch; }
+		else { last += ch; }
 	}
 
-	////// add the last one
-	for (int d = last.length(); d >= first.length(); --d) {
+	////// add the last one, last character is empty char
+	last = last.substr(0, last.length() - 1);
+	for (int d = last.length(); d >= int(first.length()); --d) {
 		string l = (d == last.length()) ? last : to_string(int(pow(10, d) - 1));
 		string f = (first.length() == d) ? first : to_string(int(pow(10, d - 1)));
-
 		if (d % 2 == 0) {
 			auto s = errcheck(l, { d / 2 }, f);
 			part1.insert(s.begin(), s.end());
 		}
-
-		auto s = errcheck(l, factors[l.length() - 2], f);
+		auto s = errcheck(l, factors[l.length() - 1], f);
 		part2.insert(s.begin(), s.end());
 	}
 	///////////////
