@@ -20,7 +20,7 @@ int main()
 		current += stoi(line.substr(1)) ;
 		part2 += abs(current / 100);
 		current = current%100 ;
-		part1 += (current = 0);
+		part1 += (current == 0);
 	}
 
 	cout << part1 << endl;
@@ -32,3 +32,4 @@ int main()
 
 	return 0;
 }
+
