@@ -29,11 +29,11 @@ int main()
 	string line;
 	while (getline(myfile,line)){
 		jolt={};
-		for (auto i=line.end()-(n+1);i!=line.end();++i) {
+		for (auto i=line.end()-(n+1); i!=line.end(); ++i) {
 			jolt.push_back(*i - '0');
 		}
 
-		for (auto i= line.rbegin()+(n+1); i!=line.rend();++i) {
+		for (auto i= line.rbegin()+(n+1); i!=line.rend(); ++i) {
 			if ((*i - '0') >= jolt[0]) {
 				int t=0;
 				while (jolt[t] >= jolt[t+1] && t <= n) {++t;}		
