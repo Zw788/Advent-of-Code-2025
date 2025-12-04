@@ -36,9 +36,13 @@ set<long long> errcheck(const string& l, const vector<int>& v, string f) {
 int main()
 {
 	auto start = chrono::steady_clock::now();
-
+	/////////////////////////////////////////////////////////
 	ifstream myfile;
-	myfile.open("../aoc2025/inputs/aoc2025_input.txt");
+	myfile.open("../aoc2025_input.txt");
+	if (!myfile.is_open()) {
+		cerr << "Error opening file" << endl;
+		return 1;
+	}
 
 	vector<vector<int>> factors = { {},{1},{1},{2},{1},{2,3},{1},{4},{3},{2,5},{1},{4,6},{1} };
 	string first;
@@ -94,8 +98,11 @@ int main()
 
 
 
+	myfile.close();
+	/////////////////////////////////////////////////////////
 	auto end = chrono::steady_clock::now();
-	cout << duration_cast<std::chrono::milliseconds>(end - start) << endl;
+	auto diff = end - start;
+	cout << "Execution time: " << chrono::duration<double, milli>(diff).count() << " ms" << endl;
 
 	return 0;
 }
