@@ -69,16 +69,14 @@ int main()
   for (int i =ranges.size(); i !=0; --i) {
     if (cull[i]) {ranges.erase(ranges.begin()+i);}
   }
-
+  
   int part1=0;
   while (getline(myfile,line)) {
     long long x=stoll(line);
     int i = bin_search(x,ranges);
-    cout << "x: " << x << "\n";
-    cout << ranges[i][0] << ": " << ranges[i][1] << "\n";
-    if (i) {part1 += bool( x >= ranges[i][0] && x <= ranges[i][1]  );}
-    cout << part1 << "\n";
+    if (i) {part1 += bool( x >= ranges[i-1][0] && x <= ranges[i-1][1]  );}
   }
+  cout << part1;
 
 
   
