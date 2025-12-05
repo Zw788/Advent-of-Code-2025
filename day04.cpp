@@ -9,17 +9,7 @@
 
 using namespace std;
 
-// 1766 too high
-
-
-// bool freepaper( const string& s, map<string,bool> g) {
-// 	int res = 0;
-// 	for (auto i : vector<vector<char>>{{-1,-1},{-1,0},{-1,1},{0,-1},{1,-1},{1,-1},{1,0},{1,1}}) {
-// 		res += bool(g[string(1,char(s[0]+i[0]))+ char(s[1]+i[1])]);
-// 	}
-// 	return bool(res < 4);
-// }
-
+// can optimize further by using another map() to just consider the boundary rolls
 
 int main()
 {
@@ -32,7 +22,6 @@ int main()
 		return 1;
 	}
 
-	int part1=0;
   map<string,bool> grid={}; // input dimension is a square, index range from 63 to (63+137=200)
   vector<string> rolls={}; // list of rolls of paper key
 
@@ -47,25 +36,42 @@ int main()
 		i+=1;
 	}
 
-	///// Padding
-	int N=line.length();
-	for (int i=0;i<N+2;++i) {
-		char x =62;
-		grid[string(1,x)+char(x+i)]=0;
-		grid[string(1,char(x+N+1))+char(x+i)]=0;
-		grid[string(1,char(x+i))+x]=0;
-		grid[string(1,char(x+i))+char(x+N+1)]=0;
-	}
 
-	for (auto i:rolls) {
-		int res = 0;
-		for (auto j : vector<vector<char>>{{-1,-1},{-1,0},{-1,1},{0,-1},{1,-1},{1,-1},{1,0},{1,1}}) {
-			res += bool(grid[string(1,char(i[0]+j[0]))+ char(i[1]+j[1])]);
+	// int part1=0;
+	// for (string i:rolls) {
+	// 	int res = 0;
+	// 	for (vector<char> j : vector<vector<char>>{{-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{1,0},{1,1}}) {
+	// 		res += grid[string(1,char(i[0]+j[0]))+ char(i[1]+j[1])];
+	// 	}
+	// 	part1+= bool(res < 4);
+	// }
+	// cout << part1 << "\n";
+
+	int part2=0;
+	vector<int> cut_roll={};
+	do {
+		cut_roll={};
+		for (int i=0; i < int(rolls.size()); ++i) {
+			int res = 0;
+			for (vector<char> j : vector<vector<char>>{{-1,-1},{-1,0},{-1,1},{0,-1},{0,1},{1,-1},{1,0},{1,1}}) {
+				res += grid[string(1,char(rolls[i][0]+j[0]))+ char(rolls[i][1]+j[1])];
+			}
+			if (res < 4) {
+				cut_roll.push_back(i);
+			}
 		}
-		part1+= bool(res < 4);
-	}
+		part2 += int(cut_roll.size());
+		for (auto i=cut_roll.rbegin(); i!=cut_roll.rend(); ++i) {
+			grid[rolls[*i]]=0;
+			rolls.erase(rolls.begin()+*i);
+		}
 
-	cout << part1;
+	} while (cut_roll.size());
+
+	cout << part2 << "\n";
+
+
+	
 
   myfile.close();
 	/////////////////////////////////////////////////////////
