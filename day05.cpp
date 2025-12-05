@@ -75,8 +75,8 @@ int main()
     long long x=stoll(line);
     int i = bin_search(x,ranges);
     cout << "x: " << x << "\n";
-    cout << ranges[max(i-1,0)][0] << ": " << ranges[max(i-1,0)][1] << "\n";
-    if (i) {part1 += bool( x >= ranges[i][0] && x <= ranges[max(i-1,0)][1]  );}
+    cout << ranges[i][0] << ": " << ranges[i][1] << "\n";
+    if (i) {part1 += bool( x >= ranges[i][0] && x <= ranges[i][1]  );}
     cout << part1 << "\n";
   }
 
