@@ -6,11 +6,7 @@
 #include <map>
 
 
-
 using namespace std;
-
-//548 too low
-
 
 int bin_search(const long long& x, const vector<vector<long long>>& sortlist) {
 	if (x > (*(sortlist.end()-1))[0] ) { return sortlist.size();	}
@@ -36,9 +32,6 @@ int main()
 		cerr << "Error opening file" << endl;
 		return 1;
 	}
-
-  // 178 ranges, 1000 ids
-
   vector<vector<long long>> ranges={};
   vector<long long> v;
   string line;
@@ -65,23 +58,22 @@ int main()
       else {break;}
     }
   }
-
-  for (int i =ranges.size(); i !=0; --i) {
+  for (int i =ranges.size()-1; i !=0; --i) {
     if (cull[i]) {ranges.erase(ranges.begin()+i);}
   }
+
   
   int part1=0;
   while (getline(myfile,line)) {
     long long x=stoll(line);
-    int i = bin_search(x,ranges);
-    if (i) {part1 += bool( x >= ranges[i-1][0] && x <= ranges[i-1][1]  );}
+    int i = max(bin_search(x,ranges)-1,0);
+    part1 += bool( x >= ranges[i][0] && x <= ranges[i][1]  );
   }
-  cout << part1;
+  cout << part1 << "\n";
 
-
-  
-
-
+  long long part2 =0;
+  for (vector<long long> r:ranges) {part2+=r[1]-r[0]+1;}
+  cout << part2 << "\n";
   
   myfile.close();
 	/////////////////////////////////////////////////////////
@@ -89,6 +81,6 @@ int main()
 	auto diff = end - start;
   cout << "\n";
 	cout << "Execution time: " << chrono::duration<double, milli>(diff).count() << " ms" << "\n";
-	/////Execution time: 281.713 ms
+	/////Execution time: 1.56448 ms
 	return 0;
 }
