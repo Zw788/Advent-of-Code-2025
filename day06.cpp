@@ -7,6 +7,8 @@
 
 using namespace std;
 
+//  2413585 too low
+
 
 int main()
 {
@@ -21,28 +23,50 @@ int main()
 
   string line;
   vector<vector<string>> nums={};
-  vector<char> prod={};
   string entry="";
-  getline(myfile,line);
-  int k=0;
-  for (int i=0; i<int(line.length()); i++) {
-    if (line[i]!=' ') {
-      entry+=string(1,line[i]);
-      continue;
+  for (auto _=0; _<5;++_) {
+    getline(myfile,line);
+    int k=0;
+    for (int i=0; i<int(line.length()); ++i) {
+      if (line[i]!=' ') {
+        entry+= line[i];
+        continue;
+      }
+      else if (entry.size()) {
+        k+=1;
+        if (int(nums.size()) < k) {nums.push_back(vector<string> {entry});}
+        else {nums[k-1].push_back(entry);}
+        entry="";
+        while (i<(int(line.length()))){
+          if (line[i+1]==' ') {i+=1;}
+          else {break;}
+        }
+      }
+      else {continue;}
+    }
+    if (_==0) {nums.push_back({ entry });}
+    else {nums[k].push_back(entry);}
+    entry="";
+  }
+
+  long long part1=0;
+  for (vector<string> n:nums) {
+    if (n[4] == "+") {
+      long long res=0;
+      for (auto i=0; i<4;++i) {res+=stoi(n[i]);}
+      part1+= res;
     }
     else {
-      k+=1;
-      if (int(nums.size()) < k) {nums.push_back({entry});}
-      else {nums[k-1].push_back(entry);}
-      entry="";
-      while (i<(int(line.length()))){
-        if (line[i+1]=' ') {i+=1;}
-        else {break;}
-      }
+      long long res=1;
+      for (auto i=0; i<4;++i) {res*=stoi(n[i]);}
+      part1+= res;
     }
   }
 
-  for (auto i:nums) {cout << i[0] << "\n";}
+  cout << part1;
+
+  
+
   
   
   myfile.close();
