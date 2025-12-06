@@ -7,10 +7,6 @@
 
 using namespace std;
 
-//  11157319961271 too low
-
-
-
 int main()
 {
 	auto start = chrono::steady_clock::now();
@@ -22,72 +18,65 @@ int main()
 		return 1;
 	}
 
-  string line;
-  vector<vector<string>> nums={};
+  string l;
+  vector<string> lines={};
   for (auto _=0; _<5;++_) {
-    getline(myfile,line);
-    string entry="";
-    int k=0;
-    for (int i=0; i<int(line.length()); ++i) {
-      if (line[i]!=' ') {
-        entry+= line[i];
-        continue;
-      }
-      else if (entry.size()) {
-        k+=1;
-        if (int(nums.size()) < k) {nums.push_back(vector<string> {entry});}
-        else {nums[k-1].push_back(entry);}
-        entry="";
-      }
-      else {continue;}
-    }
-    if (_==0) {nums.push_back({ entry });}
-    else {nums[k].push_back(entry);}
+    getline(myfile,l);
+    lines.push_back(l);
   }
 
+  int N=l.length();
+  vector<vector<string>> nums(N,{"","","","",""});
+  int k=0;
+  string entry;
+
+  for (int i=0; i < N; ++i) {
+    entry="";
+    for (int j=0; j<5; ++j){entry+=lines[j][i];}
+
+    if (entry=="     ") {k+=1;continue;}
+    else {
+      for (int j=0; j<4; ++j) {nums[k][j]+=entry[j];}
+      if (entry[4] != ' ') {nums[k][4]+=entry[4];}
+    }
+  }
+
+  nums={nums.begin(),nums.begin()+k+1};
+
   long long part1=0;
+  long long res;
+
   for (vector<string> n:nums) {
     if (n[4] == "+") {
-      long long res=0;
+      res=0;
       for (auto i=0; i<4;++i) {res+=stoi(n[i]);}
       part1+= res;
     }
     else {
-      long long res=1;
+      res=1;
       for (auto i=0; i<4;++i) {res*=stoi(n[i]);}
       part1+= res;
     }
   }
 
   long long part2=0;
-  string res;
-  long long temp;
+  string temp;
+
   for (vector<string> n:nums) {
-    temp=(n[4] == "+")? 0:1;
+    res=(n[4] == "+")? 0:1;
 
-    do {
-      res="";
-      for (int i=0; i<4; ++i) {
-        if (n[i].length()) {
-          res+=*(n[i].end()-1);
-          n[i].erase(n[i].end()-1);
-        }
-      }
-      if (res.length()) {
-        if (n[4] == "+") {temp+=stoi(res);}
-        else {temp*=stoi(res);}
-      }
-    } while (res.length());
+    for (int i=0; i < int(n[0].length()); ++i) {
+      temp="";
+      for (auto j=0; j<4;++j) { temp+=n[j][i]; }
+      if (n[4] == "+") {res+=stoi(temp);}
+      else {res*=stoi(temp);}
+    }
 
-    part2 +=temp;
+    part2 +=res;
   }
 
   cout << part1 << "\n";
   cout << part2 << "\n";
-
-  
-
-  
   
   myfile.close();
 	/////////////////////////////////////////////////////////
@@ -95,6 +84,6 @@ int main()
 	auto diff = end - start;
   cout << "\n";
 	cout << "Execution time: " << chrono::duration<double, milli>(diff).count() << " ms" << "\n";
-	/////Execution time: 1.56448 ms
+	/////Execution time: 4.28 ms
 	return 0;
 }
