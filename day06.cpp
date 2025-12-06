@@ -7,7 +7,8 @@
 
 using namespace std;
 
-//  2413585 too low
+//  11157319961271 too low
+
 
 
 int main()
@@ -23,9 +24,9 @@ int main()
 
   string line;
   vector<vector<string>> nums={};
-  string entry="";
   for (auto _=0; _<5;++_) {
     getline(myfile,line);
+    string entry="";
     int k=0;
     for (int i=0; i<int(line.length()); ++i) {
       if (line[i]!=' ') {
@@ -37,16 +38,11 @@ int main()
         if (int(nums.size()) < k) {nums.push_back(vector<string> {entry});}
         else {nums[k-1].push_back(entry);}
         entry="";
-        while (i<(int(line.length()))){
-          if (line[i+1]==' ') {i+=1;}
-          else {break;}
-        }
       }
       else {continue;}
     }
     if (_==0) {nums.push_back({ entry });}
     else {nums[k].push_back(entry);}
-    entry="";
   }
 
   long long part1=0;
@@ -63,7 +59,31 @@ int main()
     }
   }
 
-  cout << part1;
+  long long part2=0;
+  string res;
+  long long temp;
+  for (vector<string> n:nums) {
+    temp=(n[4] == "+")? 0:1;
+
+    do {
+      res="";
+      for (int i=0; i<4; ++i) {
+        if (n[i].length()) {
+          res+=*(n[i].end()-1);
+          n[i].erase(n[i].end()-1);
+        }
+      }
+      if (res.length()) {
+        if (n[4] == "+") {temp+=stoi(res);}
+        else {temp*=stoi(res);}
+      }
+    } while (res.length());
+
+    part2 +=temp;
+  }
+
+  cout << part1 << "\n";
+  cout << part2 << "\n";
 
   
 
