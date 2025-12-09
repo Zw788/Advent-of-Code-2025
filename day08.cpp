@@ -13,6 +13,7 @@ using namespace std;
 //3528 too low
 // 28288 too high
 // 7128 too low
+
 double dist(const vector<double>& x,const vector<double>& y ) {
 	return ( pow(x[0]-y[0],2) + pow(x[1]-y[1],2) + pow(x[2]-y[2],2) );
 }
@@ -80,13 +81,14 @@ int main()
 		}
 	}
 	mergeSort(dist_order,0,dist_order.size()-1);
+	// for (auto i: dist_order) {cout << i[0] << " " << i[1] << " "<< i[2] << "\n";}
 
 	// {box# : circuit# }
 
 	// Find/Parent {box# : root box# }
 	// Union {root box#:set( ...elements )}
 
-	map<int,vector<int>> circuits={};
+	map<int,int> circuits={};
 	vector<int> Rootof(N+2,N+1);
 
 
@@ -94,23 +96,21 @@ int main()
 		int a =dist_order[i][1];
 		int b =dist_order[i][2];
 
+		// cout << "a: " << a << " root of a: " << Rootof[a] << " b: " << b << " root of b: " << Rootof[b] << "\n";
+
 		if (Rootof[a]==N+1 && Rootof[b]==N+1 ) { 
 			int c=min(a,b);
-			Rootof[a]=c,Rootof[b]=c;
-			circuits[c] = {a,b};
+			Rootof[a]=c, Rootof[b]=c;
+			circuits[c] = 2;
 		 }
 		else {
 			while(Rootof[a] != Rootof[Rootof[a]]  ) {Rootof[a] = Rootof[Rootof[a]];}
 			while(Rootof[b] != Rootof[Rootof[b]]  ) {Rootof[b] = Rootof[Rootof[b]];}
 			if (Rootof[a]== Rootof[b]) {continue;}
-
 			int c=min(Rootof[a],Rootof[b]);
 			int d=max(Rootof[a],Rootof[b]);
-			Rootof[a]=c,Rootof[b]=c;
-			if ( circuits[d].size() != 0) {
-				for (auto i: circuits[d]) {Rootof[i]=c;}
-			}
-			circuits[c].insert(circuits[c].end(),circuits[d].begin(),circuits[d].end());
+			circuits[c]+=max(1,circuits[d]);
+			Rootof[a]=c, Rootof[b]=c;
 			circuits.erase(d);
 		}
 	}
@@ -118,8 +118,9 @@ int main()
 	vector<int> part1={};
 	int check=0;
 	for (auto [x,y]:circuits) {
-		check+= int(y.size());
-		part1.push_back(y.size());
+		check+= int(y);
+		// cout << y << "\n";
+		part1.push_back(y);
 		if (part1.size()<4){continue;}
 
 		int m=0;
@@ -128,9 +129,11 @@ int main()
 
 	}
 
-	cout << check << "\n";
+	// cout << "============" << "\n";
+	// cout << check << "\n";
 
 	for (auto i : part1) {cout << i << "\n";}
+
 	cout << part1[0]*part1[1]*part1[2] << "\n";
 
   
