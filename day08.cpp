@@ -10,10 +10,6 @@
 using namespace std;
 
 
-//3528 too low
-// 28288 too high
-// 7128 too low
-
 double dist(const vector<double>& x,const vector<double>& y ) {
 	return ( pow(x[0]-y[0],2) + pow(x[1]-y[1],2) + pow(x[2]-y[2],2) );
 }
@@ -65,19 +61,21 @@ int main()
   string line;
 	vector<double> a={};
   vector<vector<double>> box(N,a);
-  for (unsigned int i=0; i < N; ++i) {
+	size_t p=0;
+  for (int i=0; i < N; ++i) {
 		getline(myfile,line);
-    for (auto _: {0,1}) {
-			box[i].push_back( stof(line.substr(0,line.find(',')))/1000  );
-			line=line.substr(line.find(',')+1);
+
+    while ((p=line.find(',')) != string::npos) {
+			box[i].push_back( stod(line.substr(0,p))/1000  );
+			line=line.substr(p+1);
 		}
-		box[i].push_back( stof(line.substr(0,line.find(',')))/1000 );
+		box[i].push_back( stod(line)/1000 );
   }
 
 	vector<vector<double>> dist_order={};
 	for (int i=0; i < N-1;++i) {
 		for (int j=i+1; j < N; ++j) {
-			dist_order.push_back( { dist(box[i],box[j]) , i, j} );
+			dist_order.push_back( { dist(box[i],box[j]) , float(i), float(j)} );
 		}
 	}
 	mergeSort(dist_order,0,dist_order.size()-1);
@@ -88,11 +86,11 @@ int main()
 	// Find/Parent {box# : root box# }
 	// Union {root box#:set( ...elements )}
 
-	map<int,int> circuits={};
+	map<int,vector<int>> circuits={};
 	vector<int> Rootof(N+2,N+1);
 
 
-	for (int i=0; i< N; ++i) {
+	for (int i=0; i < int(dist_order.size()); ++i) {
 		int a =dist_order[i][1];
 		int b =dist_order[i][2];
 
@@ -101,39 +99,63 @@ int main()
 		if (Rootof[a]==N+1 && Rootof[b]==N+1 ) { 
 			int c=min(a,b);
 			Rootof[a]=c, Rootof[b]=c;
-			circuits[c] = 2;
+			circuits[c] = {a,b};
 		 }
+
 		else {
-			while(Rootof[a] != Rootof[Rootof[a]]  ) {Rootof[a] = Rootof[Rootof[a]];}
-			while(Rootof[b] != Rootof[Rootof[b]]  ) {Rootof[b] = Rootof[Rootof[b]];}
 			if (Rootof[a]== Rootof[b]) {continue;}
+
+
 			int c=min(Rootof[a],Rootof[b]);
 			int d=max(Rootof[a],Rootof[b]);
-			circuits[c]+=max(1,circuits[d]);
-			Rootof[a]=c, Rootof[b]=c;
-			circuits.erase(d);
+
+			if (d!=N+1) {
+				circuits[c].insert(circuits[c].end(), circuits[d].begin(), circuits[d].end());
+
+				if (circuits[c].size() == 1000) {
+					cout << "a: " << a << " root of a: " << Rootof[a] << " b: " << b << " root of b: " << Rootof[b] << "\n";
+					for (auto i:box[a]) {cout << i << ", ";}
+					cout << "\n";
+					for (auto i:box[b]) {cout << i << ", ";}
+					break;
+				}
+
+				for (auto i: circuits[d]) {Rootof[i]=c;}
+				circuits.erase(d);
+			}
+			else {
+				d =(Rootof[a]==N+1)? a:b;
+				circuits[c].push_back(d);
+
+				if (circuits[c].size() == 1000) {
+					cout << "a: " << a << " root of a: " << Rootof[a] << " b: " << b << " root of b: " << Rootof[b] << "\n";
+					for (auto i:box[a]) {cout << i << ", ";}
+					cout << "\n";
+					for (auto i:box[b]) {cout << i << ", ";}
+					break;
+				}
+
+				Rootof[d]=c;
+			}
 		}
 	}
 
 	vector<int> part1={};
 	int check=0;
 	for (auto [x,y]:circuits) {
-		check+= int(y);
-		// cout << y << "\n";
-		part1.push_back(y);
+		check+= int(y.size());
+		// cout << y.size() << "\n";
+		part1.push_back(y.size());
 		if (part1.size()<4){continue;}
-
 		int m=0;
 		for (auto i=1; i < 4; ++i){m=(part1[m]<=part1[i])? m: i;}
 		part1.erase(part1.begin()+m);
-
 	}
 
 	// cout << "============" << "\n";
 	// cout << check << "\n";
 
 	for (auto i : part1) {cout << i << "\n";}
-
 	cout << part1[0]*part1[1]*part1[2] << "\n";
 
   
@@ -143,6 +165,6 @@ int main()
 	auto diff = end - start;
   cout << "\n";
 	cout << "Execution time: " << chrono::duration<double, milli>(diff).count() << " ms" << "\n";
-	/////Execution time: 5.32446 ms
+	/////Execution time: 2560.55 ms
 	return 0;
 }
