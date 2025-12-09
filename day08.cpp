@@ -9,8 +9,42 @@
 
 using namespace std;
 
-float dist(const vector<float>& x,const vector<float>& y ) {
+
+//3528 too low
+// 28288 too high
+// 7128 too low
+double dist(const vector<double>& x,const vector<double>& y ) {
 	return ( pow(x[0]-y[0],2) + pow(x[1]-y[1],2) + pow(x[2]-y[2],2) );
+}
+
+// merge sort implementation
+void merge(vector<vector<double>>& vec, int lo, int mid, int hi) {
+	vector<vector<double>> vec1 = vector<vector<double>>(vec.begin()+lo, vec.begin()+mid+1);
+	vector<vector<double>> vec2 = vector<vector<double>>(vec.begin()+mid+1, vec.begin()+hi+1);
+
+	unsigned int i = 0, j = 0, k = lo;
+	while (i < vec1.size() && j < vec2.size()) {
+		if (vec1[i][0] <= vec2[j][0]) {
+			vec[k++] = vec1[i++];
+		} else {
+			vec[k++] = vec2[j++];
+		}
+	}
+	while (i < vec1.size()) {
+		vec[k++] = vec1[i++];
+	}
+	while (j < vec2.size()) {
+		vec[k++] = vec2[j++];
+	}
+}
+
+void mergeSort (vector<vector<double>>& vec, int lo, int hi)
+{
+	if (lo >= hi) return;
+	int mid = lo + (hi - lo) / 2;
+	mergeSort(vec, lo, mid);
+	mergeSort(vec, mid + 1, hi);
+	merge(vec, lo, mid, hi);
 }
 
 int main()
@@ -25,28 +59,79 @@ int main()
 	}
 
   // number of boxes =1000
+	int N=1000;
 
   string line;
-	vector<float> a={};
-  vector<vector<float>> box={1000,a};
-  for (unsigned int i=0; i < 1000; ++i) {
+	vector<double> a={};
+  vector<vector<double>> box(N,a);
+  for (unsigned int i=0; i < N; ++i) {
 		getline(myfile,line);
     for (auto _: {0,1}) {
-			box[i].push_back( stof(line.substr(0,line.find(',')))/10000  );
+			box[i].push_back( stof(line.substr(0,line.find(',')))/1000  );
 			line=line.substr(line.find(',')+1);
 		}
-		box[i].push_back( stof(line.substr(0,line.find(',')))/10000 );
+		box[i].push_back( stof(line.substr(0,line.find(',')))/1000 );
   }
 
-	float x;
-	vector<vector<int>> dist_order={};
-	for (int i=0; i < 1000-1;++i) {
-		for (int j=i+1; j < 1000; ++j) {
-			x=dist(box[i],box[j]);
-			
+	vector<vector<double>> dist_order={};
+	for (int i=0; i < N-1;++i) {
+		for (int j=i+1; j < N; ++j) {
+			dist_order.push_back( { dist(box[i],box[j]) , i, j} );
+		}
+	}
+	mergeSort(dist_order,0,dist_order.size()-1);
+
+	// {box# : circuit# }
+
+	// Find/Parent {box# : root box# }
+	// Union {root box#:set( ...elements )}
+
+	map<int,vector<int>> circuits={};
+	vector<int> Rootof(N+2,N+1);
+
+
+	for (int i=0; i< N; ++i) {
+		int a =dist_order[i][1];
+		int b =dist_order[i][2];
+
+		if (Rootof[a]==N+1 && Rootof[b]==N+1 ) { 
+			int c=min(a,b);
+			Rootof[a]=c,Rootof[b]=c;
+			circuits[c] = {a,b};
+		 }
+		else {
+			while(Rootof[a] != Rootof[Rootof[a]]  ) {Rootof[a] = Rootof[Rootof[a]];}
+			while(Rootof[b] != Rootof[Rootof[b]]  ) {Rootof[b] = Rootof[Rootof[b]];}
+			if (Rootof[a]== Rootof[b]) {continue;}
+
+			int c=min(Rootof[a],Rootof[b]);
+			int d=max(Rootof[a],Rootof[b]);
+			Rootof[a]=c,Rootof[b]=c;
+			if ( circuits[d].size() != 0) {
+				for (auto i: circuits[d]) {Rootof[i]=c;}
+			}
+			circuits[c].insert(circuits[c].end(),circuits[d].begin(),circuits[d].end());
+			circuits.erase(d);
+		}
 	}
 
+	vector<int> part1={};
+	int check=0;
+	for (auto [x,y]:circuits) {
+		check+= int(y.size());
+		part1.push_back(y.size());
+		if (part1.size()<4){continue;}
 
+		int m=0;
+		for (auto i=1; i < 4; ++i){m=(part1[m]<=part1[i])? m: i;}
+		part1.erase(part1.begin()+m);
+
+	}
+
+	cout << check << "\n";
+
+	for (auto i : part1) {cout << i << "\n";}
+	cout << part1[0]*part1[1]*part1[2] << "\n";
 
   
   myfile.close();
