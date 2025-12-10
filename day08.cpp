@@ -9,6 +9,8 @@
 
 using namespace std;
 
+// comeback for optimization
+
 
 double dist(const vector<double>& x,const vector<double>& y ) {
 	return ( pow(x[0]-y[0],2) + pow(x[1]-y[1],2) + pow(x[2]-y[2],2) );
